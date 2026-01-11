@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <title>Falcon Rev - Revenue Report Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            height: 100%;
+            width: 100%;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 520px;
+            background: #1a1a1a;
+            border-radius: 18px;
+            padding: 0;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            border: 1px solid #333;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #ff9500 0%, #ff6b35 100%);
+            padding: 40px 30px;
+            text-align: center;
+        }
+        
+        .header-logo {
+            max-width: 80px;
+            max-height: 80px;
+            margin: 0 auto 16px;
+            display: block;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 4px;
+            letter-spacing: -0.5px;
+        }
+        
+        .header p {
+            font-size: 13px;
+            color: rgba(255,255,255,0.85);
+            font-weight: 400;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .form-section {
+            margin-bottom: 24px;
+        }
+        
+        .form-section:last-child {
+            margin-bottom: 0;
+        }
+        
+        .form-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #ff9500;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .input-group {
+            position: relative;
+            margin-bottom: 14px;
+        }
+        
+        input[type="file"],
+        input[type="email"],
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #333;
+            border-radius: 10px;
+            background: #262626;
+            color: #fff;
+            font-size: 13px;
+            font-family: inherit;
+            transition: all 0.2s ease;
+        }
+        
+        input[type="file"] {
+            padding: 10px 14px;
+            cursor: pointer;
+        }
+        
+        input[type="file"]::file-selector-button {
+            background: #ff9500;
+            color: #fff;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-right: 10px;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+        
+        input[type="file"]::file-selector-button:hover {
+            background: #ff6b35;
+        }
+        
+        input[type="email"]:focus,
+        input[type="text"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #ff9500;
+            background: #2a2a2a;
+            box-shadow: 0 0 0 3px rgba(255, 149, 0, 0.1);
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 70px;
+            max-height: 100px;
+        }
+        
+        .file-info {
+            font-size: 11px;
+            color: #a1a1a1;
+            margin-top: 6px;
+            padding: 0 4px;
+        }
+        
+        .file-info.success {
+            color: #52dd7a;
+        }
+        
+        .file-info.error {
+            color: #ff6b5b;
+        }
+        
+        .logo-preview {
+            margin-top: 10px;
+            max-width: 80px;
+            max-height: 80px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            display: none;
+        }
+        
+        .logo-preview.show {
+            display: block;
+        }
+        
+        .metrics-preview {
+            background: #262626;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 14px;
+            margin: 20px 0;
+            max-height: 250px;
+            overflow-y: auto;
+            display: none;
+        }
+        
+        .metrics-preview.show {
+            display: block;
+        }
+        
+        .metric-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid #333;
+            font-size: 12px;
+        }
+        
+        .metric-item:last-child {
+            border-bottom: none;
+        }
+        
+        .metric-label {
+            color: #a1a1a1;
+        }
+        
+        .metric-value {
+            color: #ff9500;
+            font-weight: 600;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 24px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #ff9500 0%, #ff6b35 100%);
+            color: #fff;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(255, 149, 0, 0.3);
+        }
+        
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-secondary {
+            background: #333;
+            color: #fff;
+        }
+        
+        .btn-secondary:hover {
+            background: #404040;
+            transform: translateY(-2px);
+        }
+        
+        .status {
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-bottom: 16px;
+            display: none;
+            text-align: center;
+        }
+        
+        .status.show {
+            display: block;
+        }
+        
+        .status.success {
+            background: rgba(82, 221, 122, 0.1);
+            color: #52dd7a;
+            border: 1px solid rgba(82, 221, 122, 0.2);
+        }
+        
+        .status.error {
+            background: rgba(255, 107, 91, 0.1);
+            color: #ff6b5b;
+            border: 1px solid rgba(255, 107, 91, 0.2);
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid rgba(255, 149, 0, 0.3);
+            border-top: 2px solid #ff9500;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 6px;
+            vertical-align: middle;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Tablet (iPad) */
+        @media (max-width: 768px) {
+            body {
+                padding: 16px;
+            }
+            
+            .container {
+                max-width: 100%;
+            }
+            
+            .header {
+                padding: 36px 24px;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            .content {
+                padding: 24px;
+            }
+            
+            input[type="file"],
+            input[type="email"],
+            input[type="text"],
+            textarea {
+                padding: 11px 13px;
+                font-size: 16px;
+            }
+            
+            button {
+                padding: 11px 18px;
+                font-size: 12px;
+            }
+        }
+        
+        /* Mobile phones */
+        @media (max-width: 480px) {
+            body {
+                padding: 12px;
+                min-height: 100vh;
+            }
+            
+            .container {
+                max-width: 100%;
+                border-radius: 16px;
+            }
+            
+            .header {
+                padding: 30px 20px;
+            }
+            
+            .header-logo {
+                max-width: 70px;
+                max-height: 70px;
+                margin-bottom: 12px;
+            }
+            
+            .header h1 {
+                font-size: 22px;
+                margin-bottom: 2px;
+            }
+            
+            .header p {
+                font-size: 12px;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .form-section {
+                margin-bottom: 18px;
+            }
+            
+            .form-label {
+                font-size: 11px;
+                margin-bottom: 8px;
+            }
+            
+            input[type="file"],
+            input[type="email"],
+            input[type="text"],
+            textarea {
+                padding: 10px 12px;
+                font-size: 16px;
+                border-radius: 8px;
+            }
+            
+            input[type="file"]::file-selector-button {
+                padding: 5px 10px;
+                font-size: 11px;
+                margin-right: 8px;
+            }
+            
+            textarea {
+                min-height: 60px;
+            }
+            
+            .logo-preview {
+                max-width: 70px;
+                max-height: 70px;
+                margin-top: 8px;
+            }
+            
+            .metrics-preview {
+                padding: 12px;
+                margin: 16px 0;
+                max-height: 200px;
+            }
+            
+            .metric-item {
+                padding: 5px 0;
+                font-size: 11px;
+            }
+            
+            .button-group {
+                gap: 8px;
+                margin-top: 18px;
+                flex-direction: column;
+            }
+            
+            button {
+                width: 100%;
+                padding: 10px 16px;
+                font-size: 12px;
+            }
+            
+            .file-info {
+                font-size: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img id="headerLogo" class="header-logo" style="display: none;" alt="Company Logo">
+            <h1>Falcon Rev</h1>
+            <p>Revenue Report Portal</p>
+        </div>
+        
+        <div class="content">
+            <div id="statusMessage" class="status"></div>
+            
+            <form id="emailForm">
+                <!-- Logo Upload -->
+                <div class="form-section">
+                    <div class="form-label">Brand Logo</div>
+                    <div class="input-group">
+                        <input type="file" id="logoFile" accept="image/*">
+                        <div class="file-info">Upload your company logo (PNG, JPG, GIF, SVG)</div>
+                        <img id="logoPreview" class="logo-preview" alt="Logo preview">
+                    </div>
+                </div>
+                
+                <!-- Excel File Upload -->
+                <div class="form-section">
+                    <div class="form-label">Revenue Data</div>
+                    <div class="input-group">
+                        <input type="file" id="excelFile" accept=".xlsx,.xls,.csv" required>
+                        <div class="file-info" id="fileStatus">Select Excel file</div>
+                    </div>
+                </div>
+                
+                <!-- Subject Line -->
+                <div class="form-section">
+                    <div class="form-label">Email Subject</div>
+                    <div class="input-group">
+                        <input type="text" id="subject" placeholder="Enter email subject" value="Falcon Rev - Revenue Report">
+                    </div>
+                </div>
+                
+                <!-- Email Recipient -->
+                <div class="form-section">
+                    <div class="form-label">Recipient Email</div>
+                    <div class="input-group">
+                        <input type="email" id="email" placeholder="recipient@example.com" required>
+                    </div>
+                </div>
+                
+                <!-- Metrics Preview -->
+                <div id="metricsPreview" class="metrics-preview">
+                    <div style="margin-bottom: 12px; font-weight: 600; color: #ff9500; font-size: 12px; text-transform: uppercase;">Preview - Extracted Data</div>
+                    <div id="metricsContent"></div>
+                </div>
+                
+                <!-- Buttons -->
+                <div class="button-group">
+                    <button type="button" class="btn-secondary" onclick="resetForm()">Reset</button>
+                    <button type="submit" class="btn-primary" id="submitBtn">Send Email</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        let uploadedData = null;
+        let logoBase64 = '';
+        
+        // Logo File Handler
+        document.getElementById('logoFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                // Check file size (max 2MB for logos)
+                if (file.size > 2 * 1024 * 1024) {
+                    showStatus('Logo file is too large (max 2MB)', 'error');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const logoPreview = document.getElementById('logoPreview');
+                    const headerLogo = document.getElementById('headerLogo');
+                    logoPreview.src = event.target.result;
+                    headerLogo.src = event.target.result;
+                    logoPreview.classList.add('show');
+                    headerLogo.style.display = 'block';
+                    
+                    // Store base64 directly
+                    logoBase64 = event.target.result;
+                    showStatus('Logo loaded successfully', 'success');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        // Excel File Handler
+        document.getElementById('excelFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const formData = new FormData();
+                formData.append('file', file);
+                
+                showStatus('Uploading and processing file...', 'success');
+                document.getElementById('submitBtn').disabled = true;
+                
+                fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        uploadedData = data.data;
+                        showStatus('Data loaded successfully', 'success');
+                        displayMetricsPreview(data.data);
+                        document.getElementById('submitBtn').disabled = false;
+                    } else {
+                        showStatus('Error: ' + data.error, 'error');
+                        document.getElementById('submitBtn').disabled = true;
+                    }
+                })
+                .catch(err => {
+                    showStatus('Upload failed: ' + err, 'error');
+                    document.getElementById('submitBtn').disabled = true;
+                });
+            }
+        });
+        // Display Metrics Preview
+        function displayMetricsPreview(data) {
+            const metrics = data.metrics;
+            const preview = document.getElementById('metricsPreview');
+            const content = document.getElementById('metricsContent');
+            
+            const html = `
+                <div class="metric-item">
+                    <span class="metric-label">Average ADR</span>
+                    <span class="metric-value">$${metrics.average_adr?.toFixed(2) || 0}</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Avg Revenue</span>
+                    <span class="metric-value">$${metrics.average_revenue?.toLocaleString('en-US', {maximumFractionDigits: 0}) || 0}</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Avg Occupancy</span>
+                    <span class="metric-value">${metrics.average_occupancy?.toFixed(1) || 0}%</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Competitors</span>
+                    <span class="metric-value">${data.competitor_pricing?.length || 0} Hotels</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Forecast Days</span>
+                    <span class="metric-value">${data.daily_data?.length || 0} Days</span>
+                </div>
+            `;
+            
+            content.innerHTML = html;
+            preview.classList.add('show');
+        }
+        
+        // Form Submit
+        document.getElementById('emailForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (!uploadedData) {
+                showStatus('Please upload an Excel file first', 'error');
+                return;
+            }
+            
+            const email = document.getElementById('email').value;
+            const subject = document.getElementById('subject').value;
+            
+            if (!email) {
+                showStatus('Please enter recipient email', 'error');
+                return;
+            }
+            
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner"></span>Sending...';
+            
+            fetch('/api/send-email', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: email,
+                    data: uploadedData,
+                    subject: subject,
+                    logo_base64: logoBase64
+                })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    showStatus('Email sent successfully!', 'success');
+                    setTimeout(() => {
+                        resetForm();
+                    }, 2000);
+                } else {
+                    showStatus('Error: ' + data.error, 'error');
+                }
+            })
+            .catch(err => showStatus('Failed to send email: ' + err, 'error'))
+            .finally(() => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Send Email';
+            });
+        });
+        
+        // Show Status Message
+        function showStatus(message, type) {
+            const status = document.getElementById('statusMessage');
+            status.textContent = message;
+            status.className = 'status show ' + type;
+            setTimeout(() => {
+                status.classList.remove('show');
+            }, 5000);
+        }
+        
+        // Reset Form
+        function resetForm() {
+            document.getElementById('emailForm').reset();
+            document.getElementById('metricsPreview').classList.remove('show');
+            document.getElementById('logoPreview').classList.remove('show');
+            document.getElementById('headerLogo').style.display = 'none';
+            uploadedData = null;
+            logoBase64 = '';
+            document.getElementById('statusMessage').classList.remove('show');
+        }
+    </script>
+</body>
+</html>
