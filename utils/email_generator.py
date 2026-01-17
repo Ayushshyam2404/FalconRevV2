@@ -36,7 +36,7 @@ def generate_email_html(data, logo_base64="", subject_line=""):
             }}
             
             .wrapper {{
-                max-width: 680px;
+                max-width: 1000px;
                 margin: 0 auto;
                 padding: 20px;
             }}
@@ -44,7 +44,7 @@ def generate_email_html(data, logo_base64="", subject_line=""):
             .container {{
                 background: #1a1a1a;
                 border-radius: 18px;
-                overflow: hidden;
+                overflow: visible;
                 box-shadow: 0 2px 10px rgba(0,0,0,0.3);
             }}
             
@@ -59,7 +59,7 @@ def generate_email_html(data, logo_base64="", subject_line=""):
             }}
             
             .header h1 {{
-                font-size: 32px;
+                font-size: 42px;
                 font-weight: 600;
                 color: #fff;
                 margin-bottom: 8px;
@@ -67,7 +67,7 @@ def generate_email_html(data, logo_base64="", subject_line=""):
             }}
             
             .header p {{
-                font-size: 15px;
+                font-size: 18px;
                 color: rgba(255,255,255,0.9);
                 font-weight: 400;
             }}
@@ -81,7 +81,7 @@ def generate_email_html(data, logo_base64="", subject_line=""):
             }}
             
             .section-title {{
-                font-size: 16px;
+                font-size: 20px;
                 font-weight: 600;
                 color: #ff9500;
                 margin-bottom: 20px;
@@ -105,14 +105,14 @@ def generate_email_html(data, logo_base64="", subject_line=""):
             }}
             
             .metric-value {{
-                font-size: 28px;
+                font-size: 36px;
                 font-weight: 700;
                 color: #ff9500;
                 margin-bottom: 8px;
             }}
             
             .metric-label {{
-                font-size: 12px;
+                font-size: 14px;
                 color: #a1a1a1;
                 font-weight: 500;
                 letter-spacing: 0.3px;
@@ -122,7 +122,7 @@ def generate_email_html(data, logo_base64="", subject_line=""):
             .daily-table {{
                 width: 100%;
                 border-collapse: collapse;
-                font-size: 14px;
+                font-size: 16px;
             }}
             
             .daily-table thead {{
@@ -132,7 +132,7 @@ def generate_email_html(data, logo_base64="", subject_line=""):
             .daily-table th {{
                 padding: 14px 12px;
                 text-align: right;
-                font-size: 13px;
+                font-size: 15px;
                 font-weight: 600;
                 color: #a1a1a1;
                 letter-spacing: 0.3px;
@@ -161,14 +161,15 @@ def generate_email_html(data, logo_base64="", subject_line=""):
             }}
             
             .table-scroll {{
-                overflow-x: auto;
-                margin: 0 -32px;
-                padding: 0 32px;
+                overflow-x: visible;
+                margin: 0;
+                padding: 0;
                 -webkit-overflow-scrolling: touch;
             }}
             
             .table-scroll table {{
                 min-width: 100%;
+                table-layout: auto;
             }}
             
             .chart-container {{
@@ -587,6 +588,76 @@ def get_timestamp():
     """Get current timestamp"""
     from datetime import datetime
     return datetime.now().strftime("Generated on %B %d, %Y at %I:%M %p")
+
+def convert_html_to_image(html_content):
+    """
+    Convert HTML email to PNG image using Selenium and Chrome
+    Returns the image as bytes
+    """
+    try:
+        from selenium import webdriver
+        from selenium.webdriver.chrome.options import Options
+        from selenium.webdriver.common.by import By
+        from selenium.webdriver.support.ui import WebDriverWait
+        from selenium.webdriver.support import expected_conditions as EC
+        import tempfile
+        import os
+        import time
+        
+        # Set up Chrome options for headless mode
+        chrome_options = Options()
+        chrome_options.add_argument('--headless')
+        chrome_options.add_argument('--no-sandbox')
+        chrome_options.add_argument('--disable-dev-shm-usage')
+        chrome_options.add_argument('--window-size=1200,2400')
+        
+        # Create a temporary HTML file
+        with tempfile.NamedTemporaryFile(suffix='.html', delete=False, mode='w') as tmp_html:
+            tmp_html.write(html_content)
+            tmp_html_path = tmp_html.name
+        
+        # Convert file path to file:// URL
+        file_url = f"file://{tmp_html_path}"
+        
+        # Launch Chrome driver
+        driver = webdriver.Chrome(options=chrome_options)
+        
+        try:
+            # Load the HTML file
+            driver.get(file_url)
+            
+            # Wait for page to load
+            time.sleep(1)
+            
+            # Wait for wrapper to be present
+            WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.CLASS_NAME, 'wrapper'))
+            )
+            
+            # Get total scroll height
+            total_height = driver.execute_script("return document.body.scrollHeight")
+            total_width = driver.execute_script("return document.body.scrollWidth")
+            
+            # Set window size to match content
+            driver.set_window_size(max(800, total_width + 50), total_height + 100)
+            
+            # Wait a moment for layout to settle
+            time.sleep(0.5)
+            
+            # Take screenshot of entire page
+            screenshot = driver.get_screenshot_as_png()
+            
+        finally:
+            driver.quit()
+        
+        # Clean up temporary file
+        os.unlink(tmp_html_path)
+        
+        return screenshot
+        
+    except Exception as e:
+        print(f"Error converting HTML to image: {str(e)}")
+        raise Exception(f"Failed to convert email to image: {str(e)}")
 def create_rate_comparison_chart(daily_data, competitor_pricing):
     """Create a simple bar chart comparing our hotel rates vs all individual competitor rates"""
     if not daily_data or not competitor_pricing:
