@@ -122,7 +122,8 @@ def extract_daily_data(df):
 
 def extract_competitor_pricing(df):
     """
-    Extract competitor hotel pricing for CURRENT DAY ONLY (first row)
+    Extract competitor hotel pricing for NEXT 7 DAYS
+    Returns a list of dicts with daily competitor data
     """
     competitor_data = []
     
@@ -133,22 +134,32 @@ def extract_competitor_pricing(df):
         'Candlewood Suites',
         'Comfort Suites',
         'Fairfield Inn',
-        'Hampton Inn',
+        'Hampton Int',
         'Hilton Garden',
         'Holiday Inn',
         'Hyatt Place',
         'Residence Inn'
     ]
     
-    # Get competitor rates from FIRST ROW ONLY (current day)
-    first_row = df.iloc[0] if len(df) > 0 else None
-    
-    if first_row is not None:
+    # Get competitor rates for all 7 days
+    for day_idx in range(min(7, len(df))):
+        row = df.iloc[day_idx]
+        
+        # Get date for this day
+        date_col = 'Unnamed: 1'
+        date_str = f'Day {day_idx + 1}'
+        if date_col in df.columns and pd.notna(row[date_col]):
+            try:
+                date_str = str(row[date_col]).strip()
+            except:
+                pass
+        
+        day_competitors = []
+        
         for idx, col in enumerate(competitor_columns):
             if col in df.columns:
                 try:
-                    # Get rate from first row only (current day)
-                    rate_val = first_row[col]
+                    rate_val = row[col]
                     if pd.notna(rate_val):
                         try:
                             if isinstance(rate_val, str):
@@ -156,7 +167,7 @@ def extract_competitor_pricing(df):
                             else:
                                 rate = float(rate_val)
                             hotel_name = hotel_names[idx] if idx < len(hotel_names) else f'Hotel {idx+1}'
-                            competitor_data.append({
+                            day_competitors.append({
                                 'hotel': hotel_name,
                                 'rate': round(rate, 2)
                             })
@@ -164,12 +175,27 @@ def extract_competitor_pricing(df):
                             pass
                 except:
                     pass
+        
+        if day_competitors:
+            competitor_data.append({
+                'date': date_str,
+                'competitors': day_competitors
+            })
     
-    return competitor_data if competitor_data else [
-        {'hotel': 'Competitor A', 'rate': 120},
-        {'hotel': 'Competitor B', 'rate': 135},
-        {'hotel': 'Competitor C', 'rate': 110},
-    ]
+    # Return default if no data found
+    if not competitor_data:
+        return [
+            {
+                'date': f'Day {i+1}',
+                'competitors': [
+                    {'hotel': 'Competitor A', 'rate': 120 + i*2},
+                    {'hotel': 'Competitor B', 'rate': 135 + i*2},
+                    {'hotel': 'Competitor C', 'rate': 110 + i*2},
+                ]
+            } for i in range(7)
+        ]
+    
+    return competitor_data
 
 def calculate_metrics(df):
     """
