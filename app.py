@@ -5,14 +5,21 @@ import os
 from datetime import datetime
 from utils.excel_processor import process_excel_file
 from utils.email_generator import generate_email_html, convert_html_to_image
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail, Email, To, Content, Attachment, FileContent, FileName, FileType, Disposition
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.image import MIMEImage
 import base64
+from dotenv import load_dotenv
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '.env'), override=True)
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['LOGO_FOLDER'] = 'uploads/logos'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max
+
+# In-memory cache: stores the most recently processed Excel data
+_latest_data = None
 
 # Create folders if they don't exist
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
@@ -63,6 +70,10 @@ def upload_file():
         if data['daily_data']:
             current_adr = data['daily_data'][0].get('adr', 0)
             data['our_adr'] = current_adr
+        
+        # Cache for /api/latest-data
+        global _latest_data
+        _latest_data = data
         
         return jsonify({
             'success': True,
@@ -115,6 +126,13 @@ def upload_logo():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/latest-data', methods=['GET'])
+def latest_data():
+    """Return the most recently processed Excel data (for integration with external software)."""
+    if _latest_data is None:
+        return jsonify({'error': 'No data available. Upload an Excel file first.'}), 404
+    return jsonify({'success': True, 'data': _latest_data})
+
 @app.route('/api/send-email', methods=['POST'])
 def send_email():
     try:
@@ -127,8 +145,9 @@ def send_email():
         if not recipient_email or not data:
             return jsonify({'error': 'Missing email or data'}), 400
         
-        # Generate email HTML with base64 logo
-        email_html = generate_email_html(data, logo_base64=logo_base64)
+        # Generate email HTML with base64 logo and chosen theme
+        report_theme = payload.get('report_theme', 'dark')
+        email_html = generate_email_html(data, logo_base64=logo_base64, theme=report_theme)
         
         # Send email
         send_smtp_email(
@@ -142,23 +161,27 @@ def send_email():
         return jsonify({'error': str(e)}), 500
 
 def send_smtp_email(recipient_email, subject, html_content):
-    """Send email via SendGrid API with embedded and attached email image"""
-    sendgrid_api_key = os.getenv('SENDGRID_API_KEY', '').strip()
-    sender_email = os.getenv('SENDER_EMAIL', '').strip()
-    
-    if not sendgrid_api_key:
-        raise Exception('SendGrid API key not configured in .env file (SENDGRID_API_KEY)')
-    
-    if not sender_email:
-        raise Exception('Sender email not configured in .env file (SENDER_EMAIL)')
-    
+    """Send email via IONOS SMTP with embedded report image"""
+    smtp_host = os.getenv('SMTP_HOST', 'smtp.ionos.com')
+    smtp_port = int(os.getenv('SMTP_PORT', 587))
+    smtp_username = os.getenv('SMTP_USERNAME', '').strip()
+    smtp_password = os.getenv('SMTP_PASSWORD', '').strip()
+    sender_email = os.getenv('SENDER_EMAIL', smtp_username).strip()
+
+    if not smtp_username or not smtp_password:
+        raise Exception('SMTP credentials not configured in .env file (SMTP_USERNAME / SMTP_PASSWORD)')
+
     try:
         # Convert HTML to image
         email_image = convert_html_to_image(html_content)
-        image_base64 = base64.b64encode(email_image).decode('utf-8')
-        
-        # Create a simple HTML email
-        simple_html = f"""
+
+        # Build the MIME message
+        msg = MIMEMultipart('related')
+        msg['Subject'] = subject
+        msg['From'] = f'Falcon Rev <{sender_email}>'
+        msg['To'] = recipient_email
+
+        html_body = f"""
         <html>
         <body style="margin: 0; padding: 20px; background-color: #f5f5f5; font-family: Arial, sans-serif;">
             <div style="max-width: 800px; margin: 0 auto;">
@@ -171,40 +194,31 @@ def send_smtp_email(recipient_email, subject, html_content):
         </body>
         </html>
         """
-        
-        # Create SendGrid Mail object
-        from_email = Email(sender_email, "Falcon Rev")
-        to_email = To(recipient_email)
-        content = Content("text/html", simple_html)
-        
-        mail = Mail(from_email, to_email, subject, content)
-        
-        # Add inline image (displayed in email) with content_id for cid: reference
-        inline_attachment = Attachment(
-            FileContent(image_base64),
-            FileName('falcon_rev_report.png'),
-            FileType('image/png'),
-            Disposition('inline')
-        )
-        inline_attachment.content_id = 'email_report'
-        mail.add_attachment(inline_attachment)
-        
-        # Send via SendGrid
-        sg = SendGridAPIClient(sendgrid_api_key)
-        response = sg.send(mail)
-        
-        if response.status_code not in [200, 201, 202]:
-            raise Exception(f'SendGrid API error: {response.status_code}')
-        
+
+        msg.attach(MIMEText(html_body, 'html'))
+
+        # Attach the report image inline
+        img_part = MIMEImage(email_image, _subtype='png')
+        img_part.add_header('Content-ID', '<email_report>')
+        img_part.add_header('Content-Disposition', 'inline', filename='falcon_rev_report.png')
+        msg.attach(img_part)
+
+        # Send via IONOS SMTP with STARTTLS
+        with smtplib.SMTP(smtp_host, smtp_port, timeout=30) as server:
+            server.ehlo()
+            server.starttls()
+            server.ehlo()
+            server.login(smtp_username, smtp_password)
+            server.sendmail(sender_email, recipient_email, msg.as_string())
+
         return True
-        
+
+    except smtplib.SMTPAuthenticationError:
+        raise Exception('SMTP authentication failed — check SMTP_USERNAME and SMTP_PASSWORD in .env')
+    except smtplib.SMTPException as e:
+        raise Exception(f'SMTP error: {str(e)}')
     except Exception as e:
-        if 'invalid email' in str(e).lower():
-            raise Exception(f'Invalid recipient email: {recipient_email}')
-        elif 'api_key' in str(e).lower():
-            raise Exception(f'SendGrid API key invalid or missing')
-        else:
-            raise Exception(f'Email sending failed: {str(e)}')
+        raise Exception(f'Email sending failed: {str(e)}')
 
 if __name__ == '__main__':
     app.run(debug=True, port=3000)

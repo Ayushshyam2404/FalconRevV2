@@ -1,664 +1,891 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <title>Falcon Rev - Revenue Report Portal</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        html, body {
-            height: 100%;
-            width: 100%;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-        
-        .container {
-            width: 100%;
-            max-width: 520px;
-            background: #1a1a1a;
-            border-radius: 18px;
-            padding: 0;
-            overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-            border: 1px solid #333;
-        }
-        
-        .header {
-            background: linear-gradient(135deg, #ff9500 0%, #ff6b35 100%);
-            padding: 40px 30px;
-            text-align: center;
-        }
-        
-        .header-logo {
-            max-width: 80px;
-            max-height: 80px;
-            margin: 0 auto 16px;
-            display: block;
-        }
-        
-        .header h1 {
-            font-size: 28px;
-            font-weight: 700;
-            color: #fff;
-            margin-bottom: 4px;
-            letter-spacing: -0.5px;
-        }
-        
-        .header p {
-            font-size: 13px;
-            color: rgba(255,255,255,0.85);
-            font-weight: 400;
-        }
-        
-        .content {
-            padding: 30px;
-        }
-        
-        .form-section {
-            margin-bottom: 24px;
-        }
-        
-        .form-section:last-child {
-            margin-bottom: 0;
-        }
-        
-        .form-label {
-            font-size: 12px;
-            font-weight: 600;
-            color: #ff9500;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .input-group {
-            position: relative;
-            margin-bottom: 14px;
-        }
-        
-        input[type="file"],
-        input[type="email"],
-        input[type="text"],
-        textarea {
-            width: 100%;
-            padding: 12px 14px;
-            border: 1px solid #333;
-            border-radius: 10px;
-            background: #262626;
-            color: #fff;
-            font-size: 13px;
-            font-family: inherit;
-            transition: all 0.2s ease;
-        }
-        
-        input[type="file"] {
-            padding: 10px 14px;
-            cursor: pointer;
-        }
-        
-        input[type="file"]::file-selector-button {
-            background: #ff9500;
-            color: #fff;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            margin-right: 10px;
-            font-size: 12px;
-            transition: all 0.2s ease;
-        }
-        
-        input[type="file"]::file-selector-button:hover {
-            background: #ff6b35;
-        }
-        
-        input[type="email"]:focus,
-        input[type="text"]:focus,
-        textarea:focus {
-            outline: none;
-            border-color: #ff9500;
-            background: #2a2a2a;
-            box-shadow: 0 0 0 3px rgba(255, 149, 0, 0.1);
-        }
-        
-        textarea {
-            resize: vertical;
-            min-height: 70px;
-            max-height: 100px;
-        }
-        
-        .file-info {
-            font-size: 11px;
-            color: #a1a1a1;
-            margin-top: 6px;
-            padding: 0 4px;
-        }
-        
-        .file-info.success {
-            color: #52dd7a;
-        }
-        
-        .file-info.error {
-            color: #ff6b5b;
-        }
-        
-        .logo-preview {
-            margin-top: 10px;
-            max-width: 80px;
-            max-height: 80px;
-            border-radius: 8px;
-            border: 1px solid #333;
-            display: none;
-        }
-        
-        .logo-preview.show {
-            display: block;
-        }
-        
-        .metrics-preview {
-            background: #262626;
-            border: 1px solid #333;
-            border-radius: 10px;
-            padding: 14px;
-            margin: 20px 0;
-            max-height: 250px;
-            overflow-y: auto;
-            display: none;
-        }
-        
-        .metrics-preview.show {
-            display: block;
-        }
-        
-        .metric-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 6px 0;
-            border-bottom: 1px solid #333;
-            font-size: 12px;
-        }
-        
-        .metric-item:last-child {
-            border-bottom: none;
-        }
-        
-        .metric-label {
-            color: #a1a1a1;
-        }
-        
-        .metric-value {
-            color: #ff9500;
-            font-weight: 600;
-        }
-        
-        .button-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 24px;
-        }
-        
-        button {
-            flex: 1;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-transform: uppercase;
-            letter-spacing: 0.4px;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #ff9500 0%, #ff6b35 100%);
-            color: #fff;
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(255, 149, 0, 0.3);
-        }
-        
-        .btn-primary:active {
-            transform: translateY(0);
-        }
-        
-        .btn-primary:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        .btn-secondary {
-            background: #333;
-            color: #fff;
-        }
-        
-        .btn-secondary:hover {
-            background: #404040;
-            transform: translateY(-2px);
-        }
-        
-        .status {
-            padding: 10px 14px;
-            border-radius: 10px;
-            font-size: 12px;
-            margin-bottom: 16px;
-            display: none;
-            text-align: center;
-        }
-        
-        .status.show {
-            display: block;
-        }
-        
-        .status.success {
-            background: rgba(82, 221, 122, 0.1);
-            color: #52dd7a;
-            border: 1px solid rgba(82, 221, 122, 0.2);
-        }
-        
-        .status.error {
-            background: rgba(255, 107, 91, 0.1);
-            color: #ff6b5b;
-            border: 1px solid rgba(255, 107, 91, 0.2);
-        }
-        
-        .spinner {
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            border: 2px solid rgba(255, 149, 0, 0.3);
-            border-top: 2px solid #ff9500;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin-right: 6px;
-            vertical-align: middle;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        /* Tablet (iPad) */
-        @media (max-width: 768px) {
-            body {
-                padding: 16px;
-            }
-            
-            .container {
-                max-width: 100%;
-            }
-            
-            .header {
-                padding: 36px 24px;
-            }
-            
-            .header h1 {
-                font-size: 24px;
-            }
-            
-            .content {
-                padding: 24px;
-            }
-            
-            input[type="file"],
-            input[type="email"],
-            input[type="text"],
-            textarea {
-                padding: 11px 13px;
-                font-size: 16px;
-            }
-            
-            button {
-                padding: 11px 18px;
-                font-size: 12px;
-            }
-        }
-        
-        /* Mobile phones */
-        @media (max-width: 480px) {
-            body {
-                padding: 12px;
-                min-height: 100vh;
-            }
-            
-            .container {
-                max-width: 100%;
-                border-radius: 16px;
-            }
-            
-            .header {
-                padding: 30px 20px;
-            }
-            
-            .header-logo {
-                max-width: 70px;
-                max-height: 70px;
-                margin-bottom: 12px;
-            }
-            
-            .header h1 {
-                font-size: 22px;
-                margin-bottom: 2px;
-            }
-            
-            .header p {
-                font-size: 12px;
-            }
-            
-            .content {
-                padding: 20px;
-            }
-            
-            .form-section {
-                margin-bottom: 18px;
-            }
-            
-            .form-label {
-                font-size: 11px;
-                margin-bottom: 8px;
-            }
-            
-            input[type="file"],
-            input[type="email"],
-            input[type="text"],
-            textarea {
-                padding: 10px 12px;
-                font-size: 16px;
-                border-radius: 8px;
-            }
-            
-            input[type="file"]::file-selector-button {
-                padding: 5px 10px;
-                font-size: 11px;
-                margin-right: 8px;
-            }
-            
-            textarea {
-                min-height: 60px;
-            }
-            
-            .logo-preview {
-                max-width: 70px;
-                max-height: 70px;
-                margin-top: 8px;
-            }
-            
-            .metrics-preview {
-                padding: 12px;
-                margin: 16px 0;
-                max-height: 200px;
-            }
-            
-            .metric-item {
-                padding: 5px 0;
-                font-size: 11px;
-            }
-            
-            .button-group {
-                gap: 8px;
-                margin-top: 18px;
-                flex-direction: column;
-            }
-            
-            button {
-                width: 100%;
-                padding: 10px 16px;
-                font-size: 12px;
-            }
-            
-            .file-info {
-                font-size: 10px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <title>Falcon Rev — Revenue Report Portal</title>
+  <style>
+    /* ── CSS Variables ─────────────────────────────────────────────────────── */
+    :root {
+      --bg:             linear-gradient(145deg, #080808 0%, #141414 100%);
+      --card-bg:        #1a1a1a;
+      --card-border:    #2a2a2a;
+      --input-bg:       #222222;
+      --input-border:   #333333;
+      --input-focus:    #ff9500;
+      --text:           #f0f0f0;
+      --text-sub:       #aaaaaa;
+      --text-muted:     #666666;
+      --label-color:    #ff9500;
+      --step-bg:        #ff9500;
+      --divider:        #252525;
+      --preview-bg:     #141414;
+      --pill-bg:        #222222;
+      --pill-border:    #333333;
+      --pill-active-bg: rgba(255,149,0,0.12);
+      --pill-active-bd: #ff9500;
+      --pill-active-tx: #ff9500;
+      --btn-sec-bg:     #252525;
+      --btn-sec-hover:  #333333;
+      --btn-sec-text:   #cccccc;
+      --drag-bg:        #1a1a1a;
+      --drag-border:    #333333;
+      --drag-hover-bg:  #1f1f1f;
+      --drag-hover-bd:  #ff9500;
+      --shadow:         rgba(0,0,0,0.5);
+      --success-bg:     rgba(74,222,128,0.08);
+      --success-text:   #4ade80;
+      --success-border: rgba(74,222,128,0.2);
+      --error-bg:       rgba(248,113,113,0.08);
+      --error-text:     #f87171;
+      --error-border:   rgba(248,113,113,0.2);
+      --info-bg:        rgba(74,158,255,0.08);
+      --info-text:      #4a9eff;
+      --info-border:    rgba(74,158,255,0.2);
+    }
+    [data-theme="light"] {
+      --bg:             linear-gradient(145deg, #f0f2f5 0%, #e8eaf0 100%);
+      --card-bg:        #ffffff;
+      --card-border:    #e0e0e0;
+      --input-bg:       #f5f5f5;
+      --input-border:   #d8d8d8;
+      --input-focus:    #e8600a;
+      --text:           #111111;
+      --text-sub:       #555555;
+      --text-muted:     #999999;
+      --label-color:    #e8600a;
+      --step-bg:        #e8600a;
+      --divider:        #eeeeee;
+      --preview-bg:     #f8f8f8;
+      --pill-bg:        #f5f5f5;
+      --pill-border:    #d8d8d8;
+      --pill-active-bg: rgba(232,96,10,0.08);
+      --pill-active-bd: #e8600a;
+      --pill-active-tx: #e8600a;
+      --btn-sec-bg:     #eeeeee;
+      --btn-sec-hover:  #e0e0e0;
+      --btn-sec-text:   #444444;
+      --drag-bg:        #fafafa;
+      --drag-border:    #d8d8d8;
+      --drag-hover-bg:  #fff7ed;
+      --drag-hover-bd:  #e8600a;
+      --shadow:         rgba(0,0,0,0.1);
+      --success-bg:     rgba(21,128,61,0.06);
+      --success-text:   #15803d;
+      --success-border: rgba(21,128,61,0.2);
+      --error-bg:       rgba(185,28,28,0.06);
+      --error-text:     #b91c1c;
+      --error-border:   rgba(185,28,28,0.2);
+      --info-bg:        rgba(37,99,235,0.06);
+      --info-text:      #2563eb;
+      --info-border:    rgba(37,99,235,0.2);
+    }
+
+    /* ── Reset ─────────────────────────────────────────────────────────────── */
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html, body { height:100%; width:100%; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 24px 16px 48px;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    /* ── Layout ────────────────────────────────────────────────────────────── */
+    .page-wrap {
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    /* ── Card ──────────────────────────────────────────────────────────────── */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 8px 40px var(--shadow);
+      transition: background 0.3s ease, border-color 0.3s ease;
+    }
+
+    /* ── Header ────────────────────────────────────────────────────────────── */
+    .header {
+      background: linear-gradient(135deg, #ff9500 0%, #e8600a 100%);
+      padding: 40px 32px 36px;
+      text-align: center;
+      position: relative;
+    }
+    .theme-toggle {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.35);
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      backdrop-filter: blur(4px);
+    }
+    .theme-toggle:hover {
+      background: rgba(255,255,255,0.28);
+      border-color: rgba(255,255,255,0.6);
+      transform: scale(1.08);
+    }
+    .header-logo {
+      max-width: 72px;
+      max-height: 72px;
+      margin: 0 auto 14px;
+      display: none;
+      border-radius: 10px;
+    }
+    .header h1 {
+      font-size: 30px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.5px;
+      margin-bottom: 4px;
+    }
+    .header p {
+      font-size: 13px;
+      color: rgba(255,255,255,0.82);
+    }
+
+    /* ── Content ───────────────────────────────────────────────────────────── */
+    .content { padding: 28px 28px 24px; }
+
+    /* ── Steps ─────────────────────────────────────────────────────────────── */
+    .step-group {
+      margin-bottom: 24px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--divider);
+    }
+    .step-group:last-of-type {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+    .step-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .step-num {
+      width: 24px;
+      height: 24px;
+      background: var(--step-bg);
+      color: #fff;
+      border-radius: 50%;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .step-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: 0.3px;
+    }
+
+    /* ── Form Labels ───────────────────────────────────────────────────────── */
+    .form-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--label-color);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      display: block;
+    }
+    .field { margin-bottom: 14px; }
+    .field:last-child { margin-bottom: 0; }
+
+    /* ── Inputs ────────────────────────────────────────────────────────────── */
+    input[type="email"],
+    input[type="text"],
+    textarea {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1px solid var(--input-border);
+      border-radius: 10px;
+      background: var(--input-bg);
+      color: var(--text);
+      font-size: 14px;
+      font-family: inherit;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+      outline: none;
+    }
+    input[type="email"]:focus,
+    input[type="text"]:focus,
+    textarea:focus {
+      border-color: var(--input-focus);
+      box-shadow: 0 0 0 3px rgba(255,149,0,0.12);
+    }
+    textarea {
+      resize: vertical;
+      min-height: 68px;
+    }
+    .hint {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 5px;
+    }
+
+    /* ── Drag-drop zone ────────────────────────────────────────────────────── */
+    .drop-zone {
+      border: 2px dashed var(--drag-border);
+      border-radius: 12px;
+      background: var(--drag-bg);
+      padding: 24px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+    .drop-zone:hover, .drop-zone.drag-over {
+      background: var(--drag-hover-bg);
+      border-color: var(--drag-hover-bd);
+    }
+    .drop-zone.has-file {
+      border-style: solid;
+      border-color: var(--input-focus);
+      background: var(--pill-active-bg);
+    }
+    .drop-zone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+    .drop-icon { font-size: 28px; margin-bottom: 8px; }
+    .drop-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .drop-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .drop-zone.has-file .drop-icon { font-size: 26px; }
+    .drop-zone.has-file .drop-title { color: var(--input-focus); }
+
+    /* ── Logo preview ──────────────────────────────────────────────────────── */
+    .logo-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-top: 10px;
+      display: none;
+    }
+    .logo-row.show { display: flex; }
+    .logo-thumb {
+      width: 56px;
+      height: 56px;
+      object-fit: contain;
+      border-radius: 8px;
+      border: 1px solid var(--card-border);
+      background: var(--preview-bg);
+    }
+    .logo-name {
+      font-size: 12px;
+      color: var(--text-sub);
+      word-break: break-all;
+    }
+
+    /* ── Theme Picker (for report) ─────────────────────────────────────────── */
+    .theme-pills {
+      display: flex;
+      gap: 10px;
+    }
+    .theme-pill {
+      flex: 1;
+      padding: 10px 16px;
+      border: 2px solid var(--pill-border);
+      border-radius: 10px;
+      background: var(--pill-bg);
+      color: var(--text-sub);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+      font-family: inherit;
+    }
+    .theme-pill.active {
+      border-color: var(--pill-active-bd);
+      color: var(--pill-active-tx);
+      background: var(--pill-active-bg);
+      font-weight: 600;
+    }
+    .theme-pill:hover:not(.active) {
+      border-color: rgba(255,149,0,0.35);
+      color: var(--text);
+    }
+
+    /* ── Metrics Preview ───────────────────────────────────────────────────── */
+    .metrics-preview {
+      background: var(--preview-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: none;
+    }
+    .metrics-preview.show { display: block; }
+    .preview-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--label-color);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 10px;
+    }
+    .preview-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px 12px;
+    }
+    .preview-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 8px;
+      background: var(--card-bg);
+      border-radius: 7px;
+      border: 1px solid var(--divider);
+    }
+    .preview-label { font-size: 11px; color: var(--text-muted); }
+    .preview-val   { font-size: 12px; font-weight: 700; color: var(--label-color); }
+
+    /* ── Buttons ───────────────────────────────────────────────────────────── */
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .btn {
+      flex: 1;
+      padding: 13px 20px;
+      border: none;
+      border-radius: 11px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #ff9500 0%, #e8600a 100%);
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(255,149,0,0.25);
+    }
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(255,149,0,0.35);
+    }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    .btn-secondary {
+      background: var(--btn-sec-bg);
+      color: var(--btn-sec-text);
+    }
+    .btn-secondary:hover {
+      background: var(--btn-sec-hover);
+    }
+
+    /* ── Status ────────────────────────────────────────────────────────────── */
+    .status {
+      padding: 11px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      margin-bottom: 16px;
+      display: none;
+      align-items: center;
+      gap: 8px;
+    }
+    .status.show { display: flex; }
+    .status.success { background: var(--success-bg); color: var(--success-text); border: 1px solid var(--success-border); }
+    .status.error   { background: var(--error-bg);   color: var(--error-text);   border: 1px solid var(--error-border);   }
+    .status.info    { background: var(--info-bg);     color: var(--info-text);    border: 1px solid var(--info-border);    }
+
+    /* ── Spinner ───────────────────────────────────────────────────────────── */
+    .spinner {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(255,149,0,0.3);
+      border-top-color: #ff9500;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Progress bar ──────────────────────────────────────────────────────── */
+    .progress-wrap {
+      height: 3px;
+      background: var(--divider);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 6px;
+      display: none;
+    }
+    .progress-wrap.show { display: block; }
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #ff9500, #e8600a);
+      border-radius: 2px;
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+
+    /* ── Success screen ────────────────────────────────────────────────────── */
+    .success-screen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 32px;
+      text-align: center;
+    }
+    .success-screen.show { display: flex; }
+    .success-icon {
+      font-size: 56px;
+      margin-bottom: 18px;
+    }
+    .success-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    .success-sub {
+      font-size: 14px;
+      color: var(--text-sub);
+      margin-bottom: 28px;
+    }
+
+    /* ── Responsive ────────────────────────────────────────────────────────── */
+    @media (max-width: 640px) {
+      body { padding: 12px 10px 36px; }
+      .content { padding: 22px 20px 20px; }
+      .header { padding: 34px 24px 30px; }
+      .header h1 { font-size: 26px; }
+      .preview-grid { grid-template-columns: 1fr; }
+      .btn-row { flex-direction: column; }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <img id="headerLogo" class="header-logo" style="display: none;" alt="Company Logo">
-            <h1>Falcon Rev</h1>
-            <p>Revenue Report Portal</p>
-        </div>
-        
-        <div class="content">
-            <div id="statusMessage" class="status"></div>
-            
-            <form id="emailForm">
-                <!-- Logo Upload -->
-                <div class="form-section">
-                    <div class="form-label">Brand Logo</div>
-                    <div class="input-group">
-                        <input type="file" id="logoFile" accept="image/*">
-                        <div class="file-info">Upload your company logo (PNG, JPG, GIF, SVG)</div>
-                        <img id="logoPreview" class="logo-preview" alt="Logo preview">
-                    </div>
-                </div>
-                
-                <!-- Excel File Upload -->
-                <div class="form-section">
-                    <div class="form-label">Revenue Data</div>
-                    <div class="input-group">
-                        <input type="file" id="excelFile" accept=".xlsx,.xls,.csv" required>
-                        <div class="file-info" id="fileStatus">Select Excel file</div>
-                    </div>
-                </div>
-                
-                <!-- Subject Line -->
-                <div class="form-section">
-                    <div class="form-label">Email Subject</div>
-                    <div class="input-group">
-                        <input type="text" id="subject" placeholder="Enter email subject" value="Falcon Rev - Revenue Report">
-                    </div>
-                </div>
-                
-                <!-- Email Recipient -->
-                <div class="form-section">
-                    <div class="form-label">Recipient Email</div>
-                    <div class="input-group">
-                        <input type="email" id="email" placeholder="recipient@example.com" required>
-                    </div>
-                </div>
-                
-                <!-- Metrics Preview -->
-                <div id="metricsPreview" class="metrics-preview">
-                    <div style="margin-bottom: 12px; font-weight: 600; color: #ff9500; font-size: 12px; text-transform: uppercase;">Preview - Extracted Data</div>
-                    <div id="metricsContent"></div>
-                </div>
-                
-                <!-- Buttons -->
-                <div class="button-group">
-                    <button type="button" class="btn-secondary" onclick="resetForm()">Reset</button>
-                    <button type="submit" class="btn-primary" id="submitBtn">Send Email</button>
-                </div>
-            </form>
-        </div>
+<div class="page-wrap">
+<div class="card">
+
+  <!-- Header -->
+  <div class="header">
+    <button class="theme-toggle" id="portalThemeBtn" onclick="togglePortalTheme()" title="Toggle portal theme">
+      <span id="portalThemeIcon">☀️</span>
+    </button>
+    <img id="headerLogo" class="header-logo" alt="Brand Logo">
+    <h1>Falcon Rev</h1>
+    <p>Revenue Report Portal</p>
+  </div>
+
+  <!-- Content -->
+  <div class="content">
+
+    <!-- Status bar -->
+    <div id="statusMsg" class="status"></div>
+    <div id="progressWrap" class="progress-wrap">
+      <div id="progressBar" class="progress-bar"></div>
     </div>
-    
-    <script>
-        let uploadedData = null;
-        let logoBase64 = '';
-        
-        // Logo File Handler
-        document.getElementById('logoFile').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                // Check file size (max 2MB for logos)
-                if (file.size > 2 * 1024 * 1024) {
-                    showStatus('Logo file is too large (max 2MB)', 'error');
-                    return;
-                }
-                
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    const logoPreview = document.getElementById('logoPreview');
-                    const headerLogo = document.getElementById('headerLogo');
-                    logoPreview.src = event.target.result;
-                    headerLogo.src = event.target.result;
-                    logoPreview.classList.add('show');
-                    headerLogo.style.display = 'block';
-                    
-                    // Store base64 directly
-                    logoBase64 = event.target.result;
-                    showStatus('Logo loaded successfully', 'success');
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-        
-        // Excel File Handler
-        document.getElementById('excelFile').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const formData = new FormData();
-                formData.append('file', file);
-                
-                showStatus('Uploading and processing file...', 'success');
-                document.getElementById('submitBtn').disabled = true;
-                
-                fetch('/api/upload', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(r => r.json())
-                .then(data => {
-                    if (data.success) {
-                        uploadedData = data.data;
-                        showStatus('Data loaded successfully', 'success');
-                        displayMetricsPreview(data.data);
-                        document.getElementById('submitBtn').disabled = false;
-                    } else {
-                        showStatus('Error: ' + data.error, 'error');
-                        document.getElementById('submitBtn').disabled = true;
-                    }
-                })
-                .catch(err => {
-                    showStatus('Upload failed: ' + err, 'error');
-                    document.getElementById('submitBtn').disabled = true;
-                });
-            }
-        });
-        // Display Metrics Preview
-        function displayMetricsPreview(data) {
-            const metrics = data.metrics;
-            const preview = document.getElementById('metricsPreview');
-            const content = document.getElementById('metricsContent');
-            
-            const html = `
-                <div class="metric-item">
-                    <span class="metric-label">Average ADR</span>
-                    <span class="metric-value">$${metrics.average_adr?.toFixed(2) || 0}</span>
-                </div>
-                <div class="metric-item">
-                    <span class="metric-label">Avg Revenue</span>
-                    <span class="metric-value">$${metrics.average_revenue?.toLocaleString('en-US', {maximumFractionDigits: 0}) || 0}</span>
-                </div>
-                <div class="metric-item">
-                    <span class="metric-label">Avg Occupancy</span>
-                    <span class="metric-value">${metrics.average_occupancy?.toFixed(1) || 0}%</span>
-                </div>
-                <div class="metric-item">
-                    <span class="metric-label">Competitors</span>
-                    <span class="metric-value">${data.competitor_pricing?.length || 0} Hotels</span>
-                </div>
-                <div class="metric-item">
-                    <span class="metric-label">Forecast Days</span>
-                    <span class="metric-value">${data.daily_data?.length || 0} Days</span>
-                </div>
-            `;
-            
-            content.innerHTML = html;
-            preview.classList.add('show');
+
+    <!-- Success screen -->
+    <div id="successScreen" class="success-screen">
+      <div class="success-icon">✅</div>
+      <div class="success-title">Report Sent!</div>
+      <div class="success-sub" id="successDetail">Email delivered successfully.</div>
+      <button class="btn btn-primary" onclick="showFormAgain()" style="max-width:220px;">
+        Send Another
+      </button>
+    </div>
+
+    <!-- Main form -->
+    <form id="emailForm" onsubmit="handleSubmit(event)">
+
+      <!-- Step 1: Upload Data -->
+      <div class="step-group">
+        <div class="step-header">
+          <div class="step-num">1</div>
+          <div class="step-title">Upload Revenue Data</div>
+        </div>
+
+        <div class="field">
+          <label class="form-label">Excel File</label>
+          <div class="drop-zone" id="excelDrop">
+            <input type="file" id="excelFile" accept=".xlsx,.xls,.csv" required onchange="handleExcelChange(event)">
+            <div class="drop-icon">📊</div>
+            <div class="drop-title" id="excelDropTitle">Drop Excel file here or click to browse</div>
+            <div class="drop-sub">.xlsx · .xls · .csv</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="form-label">Brand Logo <span style="font-weight:400;opacity:0.6;">(optional)</span></label>
+          <div class="drop-zone" id="logoDrop">
+            <input type="file" id="logoFile" accept="image/*" onchange="handleLogoChange(event)">
+            <div class="drop-icon">🖼️</div>
+            <div class="drop-title" id="logoDropTitle">Drop logo here or click to browse</div>
+            <div class="drop-sub">PNG · JPG · SVG · max 2 MB</div>
+          </div>
+          <div class="logo-row" id="logoRow">
+            <img id="logoThumb" class="logo-thumb" alt="Logo preview">
+            <span id="logoName" class="logo-name"></span>
+          </div>
+        </div>
+
+        <!-- Live preview after upload -->
+        <div id="metricsPreview" class="metrics-preview" style="margin-top:12px;">
+          <div class="preview-title">&#9654; Extracted Data Preview</div>
+          <div id="metricsContent" class="preview-grid"></div>
+        </div>
+      </div>
+
+      <!-- Step 2: Configure Report -->
+      <div class="step-group">
+        <div class="step-header">
+          <div class="step-num">2</div>
+          <div class="step-title">Configure Report</div>
+        </div>
+
+        <div class="field">
+          <label class="form-label">Email Report Theme</label>
+          <div class="theme-pills">
+            <button type="button" class="theme-pill active" data-rtheme="dark"  onclick="selectReportTheme('dark')">🌑 Dark Mode</button>
+            <button type="button" class="theme-pill"        data-rtheme="light" onclick="selectReportTheme('light')">☀️ Light Mode</button>
+          </div>
+          <div class="hint">Choose how the emailed report looks to recipients.</div>
+        </div>
+
+        <div class="field">
+          <label class="form-label">Email Subject</label>
+          <input type="text" id="subject" value="Falcon Rev — 7-Day Revenue Report" placeholder="Email subject line">
+        </div>
+      </div>
+
+      <!-- Step 3: Send -->
+      <div class="step-group">
+        <div class="step-header">
+          <div class="step-num">3</div>
+          <div class="step-title">Send to Recipient</div>
+        </div>
+
+        <div class="field">
+          <label class="form-label">Recipient Email</label>
+          <input type="email" id="email" placeholder="recipient@hotel.com" required>
+        </div>
+
+        <div class="btn-row">
+          <button type="button" class="btn btn-secondary" onclick="resetForm()">Reset</button>
+          <button type="submit" class="btn btn-primary" id="submitBtn" disabled>
+            Generate &amp; Send
+          </button>
+        </div>
+      </div>
+
+    </form><!-- /emailForm -->
+
+  </div><!-- /content -->
+</div><!-- /card -->
+</div><!-- /page-wrap -->
+
+<script>
+  /* ── State ─────────────────────────────────────────────────────────────── */
+  let uploadedData  = null;
+  let logoBase64    = '';
+  let reportTheme   = 'dark';
+
+  /* ── Portal theme ──────────────────────────────────────────────────────── */
+  (function initTheme() {
+    const saved = localStorage.getItem('portalTheme') || 'dark';
+    document.documentElement.setAttribute('data-theme', saved);
+    document.getElementById('portalThemeIcon').textContent = saved === 'light' ? '🌙' : '☀️';
+  })();
+
+  function togglePortalTheme() {
+    const html    = document.documentElement;
+    const isLight = html.getAttribute('data-theme') === 'light';
+    const next    = isLight ? 'dark' : 'light';
+    html.setAttribute('data-theme', next);
+    document.getElementById('portalThemeIcon').textContent = next === 'light' ? '🌙' : '☀️';
+    localStorage.setItem('portalTheme', next);
+  }
+
+  /* ── Report theme ──────────────────────────────────────────────────────── */
+  function selectReportTheme(theme) {
+    reportTheme = theme;
+    document.querySelectorAll('.theme-pill[data-rtheme]').forEach(p => {
+      p.classList.toggle('active', p.dataset.rtheme === theme);
+    });
+  }
+
+  /* ── Drag-drop helpers ─────────────────────────────────────────────────── */
+  ['excelDrop', 'logoDrop'].forEach(id => {
+    const zone = document.getElementById(id);
+    zone.addEventListener('dragover',  e => { e.preventDefault(); zone.classList.add('drag-over'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+    zone.addEventListener('drop', e => {
+      e.preventDefault();
+      zone.classList.remove('drag-over');
+      const files = e.dataTransfer.files;
+      if (!files.length) return;
+      if (id === 'excelDrop') {
+        document.getElementById('excelFile').files = files;
+        handleExcelChange({ target: { files } });
+      } else {
+        document.getElementById('logoFile').files = files;
+        handleLogoChange({ target: { files } });
+      }
+    });
+  });
+
+  /* ── Excel upload ──────────────────────────────────────────────────────── */
+  function handleExcelChange(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const drop  = document.getElementById('excelDrop');
+    const title = document.getElementById('excelDropTitle');
+    const submitBtn = document.getElementById('submitBtn');
+
+    title.textContent = file.name;
+    drop.classList.add('has-file');
+    submitBtn.disabled = true;
+
+    showStatus(`Processing ${file.name}…`, 'info');
+    setProgress(20);
+
+    const fd = new FormData();
+    fd.append('file', file);
+
+    fetch('/api/upload', { method: 'POST', body: fd })
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          uploadedData = data.data;
+          showStatus('Data loaded — ready to send.', 'success');
+          renderPreview(data.data);
+          submitBtn.disabled = false;
+          setProgress(100);
+          setTimeout(() => setProgress(0), 600);
+        } else {
+          showStatus('Error: ' + data.error, 'error');
+          drop.classList.remove('has-file');
+          title.textContent = 'Drop Excel file here or click to browse';
+          setProgress(0);
         }
-        
-        // Form Submit
-        document.getElementById('emailForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            if (!uploadedData) {
-                showStatus('Please upload an Excel file first', 'error');
-                return;
-            }
-            
-            const email = document.getElementById('email').value;
-            const subject = document.getElementById('subject').value;
-            
-            if (!email) {
-                showStatus('Please enter recipient email', 'error');
-                return;
-            }
-            
-            const submitBtn = document.getElementById('submitBtn');
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<span class="spinner"></span>Sending...';
-            
-            fetch('/api/send-email', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    email: email,
-                    data: uploadedData,
-                    subject: subject,
-                    logo_base64: logoBase64
-                })
-            })
-            .then(r => r.json())
-            .then(data => {
-                if (data.success) {
-                    showStatus('Email sent successfully!', 'success');
-                    setTimeout(() => {
-                        resetForm();
-                    }, 2000);
-                } else {
-                    showStatus('Error: ' + data.error, 'error');
-                }
-            })
-            .catch(err => showStatus('Failed to send email: ' + err, 'error'))
-            .finally(() => {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = 'Send Email';
-            });
-        });
-        
-        // Show Status Message
-        function showStatus(message, type) {
-            const status = document.getElementById('statusMessage');
-            status.textContent = message;
-            status.className = 'status show ' + type;
-            setTimeout(() => {
-                status.classList.remove('show');
-            }, 5000);
-        }
-        
-        // Reset Form
-        function resetForm() {
-            document.getElementById('emailForm').reset();
-            document.getElementById('metricsPreview').classList.remove('show');
-            document.getElementById('logoPreview').classList.remove('show');
-            document.getElementById('headerLogo').style.display = 'none';
-            uploadedData = null;
-            logoBase64 = '';
-            document.getElementById('statusMessage').classList.remove('show');
-        }
-    </script>
+      })
+      .catch(err => {
+        showStatus('Upload failed: ' + err, 'error');
+        drop.classList.remove('has-file');
+        title.textContent = 'Drop Excel file here or click to browse';
+        setProgress(0);
+      });
+  }
+
+  /* ── Logo upload ───────────────────────────────────────────────────────── */
+  function handleLogoChange(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      showStatus('Logo too large (max 2 MB)', 'error');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = ev => {
+      logoBase64 = ev.target.result;
+      const thumb  = document.getElementById('logoThumb');
+      const row    = document.getElementById('logoRow');
+      const header = document.getElementById('headerLogo');
+      const drop   = document.getElementById('logoDrop');
+      const title  = document.getElementById('logoDropTitle');
+
+      thumb.src   = logoBase64;
+      header.src  = logoBase64;
+      header.style.display = 'block';
+      document.getElementById('logoName').textContent = file.name;
+      row.classList.add('show');
+      drop.classList.add('has-file');
+      title.textContent = file.name;
+      showStatus('Logo loaded.', 'success');
+    };
+    reader.readAsDataURL(file);
+  }
+
+  /* ── Metrics preview ───────────────────────────────────────────────────── */
+  function renderPreview(data) {
+    const m   = data.metrics || {};
+    const preview = document.getElementById('metricsPreview');
+    const content = document.getElementById('metricsContent');
+
+    const items = [
+      { label: 'Avg ADR',       val: '$' + (m.average_adr?.toFixed(2) || '0') },
+      { label: 'Avg Revenue',   val: '$' + (m.average_revenue?.toLocaleString('en-US', {maximumFractionDigits:0}) || '0') },
+      { label: 'Avg Occupancy', val: (m.average_occupancy?.toFixed(1) || '0') + '%' },
+      { label: 'Avg Pickups',   val: (m.average_pickups?.toFixed(0)   || '0') + '/day' },
+      { label: 'Forecast Days', val: (data.daily_data?.length || 0) + ' days' },
+      { label: 'Competitors',   val: (data.competitor_pricing?.length || 0) + ' entries' },
+    ];
+
+    content.innerHTML = items.map(i =>
+      `<div class="preview-item">
+        <span class="preview-label">${i.label}</span>
+        <span class="preview-val">${i.val}</span>
+      </div>`
+    ).join('');
+    preview.classList.add('show');
+  }
+
+  /* ── Form submit ───────────────────────────────────────────────────────── */
+  function handleSubmit(e) {
+    e.preventDefault();
+    if (!uploadedData) { showStatus('Please upload an Excel file first.', 'error'); return; }
+
+    const email   = document.getElementById('email').value.trim();
+    const subject = document.getElementById('subject').value.trim();
+    if (!email) { showStatus('Enter a recipient email.', 'error'); return; }
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>&nbsp;Sending…';
+    showStatus('Generating report and sending email…', 'info');
+    setProgress(15);
+
+    const interval = progressPulse(15, 85, 8000);
+
+    fetch('/api/send-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email,
+        data:         uploadedData,
+        subject,
+        logo_base64:  logoBase64,
+        report_theme: reportTheme
+      })
+    })
+    .then(r => r.json())
+    .then(data => {
+      clearInterval(interval);
+      if (data.success) {
+        setProgress(100);
+        setTimeout(() => {
+          setProgress(0);
+          showSuccessScreen(email);
+        }, 400);
+      } else {
+        showStatus('Error: ' + data.error, 'error');
+        setProgress(0);
+        btn.disabled = false;
+        btn.innerHTML = 'Generate &amp; Send';
+      }
+    })
+    .catch(err => {
+      clearInterval(interval);
+      showStatus('Failed: ' + err, 'error');
+      setProgress(0);
+      btn.disabled = false;
+      btn.innerHTML = 'Generate &amp; Send';
+    });
+  }
+
+  /* ── Progress helpers ──────────────────────────────────────────────────── */
+  function setProgress(pct) {
+    const wrap = document.getElementById('progressWrap');
+    const bar  = document.getElementById('progressBar');
+    if (pct > 0) { wrap.classList.add('show'); bar.style.width = pct + '%'; }
+    else         { bar.style.width = '0%'; setTimeout(() => wrap.classList.remove('show'), 400); }
+  }
+
+  function progressPulse(from, to, durationMs) {
+    const start = Date.now();
+    return setInterval(() => {
+      const elapsed = Date.now() - start;
+      const frac    = Math.min(elapsed / durationMs, 1);
+      const curved  = from + (to - from) * (1 - Math.exp(-3 * frac));
+      setProgress(curved);
+    }, 100);
+  }
+
+  /* ── Success screen ────────────────────────────────────────────────────── */
+  function showSuccessScreen(email) {
+    document.getElementById('emailForm').style.display   = 'none';
+    document.getElementById('statusMsg').classList.remove('show');
+    document.getElementById('successDetail').textContent = `Report delivered to ${email}`;
+    document.getElementById('successScreen').classList.add('show');
+  }
+
+  function showFormAgain() {
+    document.getElementById('successScreen').classList.remove('show');
+    document.getElementById('emailForm').style.display = '';
+    resetForm();
+  }
+
+  /* ── Status ────────────────────────────────────────────────────────────── */
+  function showStatus(msg, type) {
+    const el = document.getElementById('statusMsg');
+    const icons = { success: '✓', error: '✕', info: '◎' };
+    el.innerHTML = `<span>${icons[type] || '●'}</span><span>${msg}</span>`;
+    el.className = 'status show ' + type;
+    if (type === 'success') setTimeout(() => el.classList.remove('show'), 5000);
+  }
+
+  /* ── Reset ─────────────────────────────────────────────────────────────── */
+  function resetForm() {
+    document.getElementById('emailForm').reset();
+    uploadedData = null;
+    logoBase64   = '';
+    reportTheme  = 'dark';
+
+    document.getElementById('metricsPreview').classList.remove('show');
+    document.getElementById('logoRow').classList.remove('show');
+    document.getElementById('headerLogo').style.display = 'none';
+    document.getElementById('statusMsg').classList.remove('show');
+    document.getElementById('excelDrop').classList.remove('has-file');
+    document.getElementById('logoDrop').classList.remove('has-file');
+    document.getElementById('excelDropTitle').textContent = 'Drop Excel file here or click to browse';
+    document.getElementById('logoDropTitle').textContent  = 'Drop logo here or click to browse';
+
+    document.querySelectorAll('.theme-pill[data-rtheme]').forEach(p => {
+      p.classList.toggle('active', p.dataset.rtheme === 'dark');
+    });
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.innerHTML = 'Generate &amp; Send';
+    setProgress(0);
+  }
+</script>
 </body>
 </html>
